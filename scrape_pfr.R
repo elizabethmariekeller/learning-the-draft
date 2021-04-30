@@ -72,9 +72,7 @@ parse_pfr_tables <- function(tables) {
   bind_rows(results)
 }
 
-if (!file.exists('data/drafts.feather')) {
-  
-draft.table <- data_frame(year = 2000:2015) %>%
+draft.table <- data_frame(year = 1994:2020) %>%
   group_by(year) %>% do({
     url <- paste('http://www.pro-football-reference.com/years/', .$year, '/draft.htm', sep ='')
     doc <- read_html(url)
@@ -94,11 +92,8 @@ draft.table <- data_frame(year = 2000:2015) %>%
   ungroup
 write_feather(draft.table, 'data/drafts.feather')
 
-}
-
-if (!file.exists('data/combines.feather')) {
-  
-combine.table <- data_frame(year = 2000:2016) %>%
+## not needed in current analysis
+combine.table <- data_frame(year = 1994:2020) %>%
   group_by(year) %>% do({
     url <- paste('http://www.pro-football-reference.com/draft/', .$year, '-combine.htm', sep ='')
     html.table <- read_html(url) %>%
@@ -117,7 +112,7 @@ combine.table <- data_frame(year = 2000:2016) %>%
   ungroup
 
 write_feather(combine.table, 'data/combines.feather')
-}
+
 
 all.urls <- combine.table %>%
   select(url) %>%
