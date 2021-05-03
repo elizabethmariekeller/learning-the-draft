@@ -72,7 +72,7 @@ parse_pfr_tables <- function(tables) {
   bind_rows(results)
 }
 
-draft.table <- data_frame(year = 1994:2020) %>%
+draft.table <- data_frame(year = 1994:2021) %>%
   group_by(year) %>% do({
     url <- paste('http://www.pro-football-reference.com/years/', .$year, '/draft.htm', sep ='')
     doc <- read_html(url)
@@ -92,7 +92,23 @@ draft.table <- data_frame(year = 1994:2020) %>%
   ungroup
 write_feather(draft.table, 'data/drafts.feather')
 
-## not needed in current analysis
+# some of the players do not have colleges listed
+# read in supplementary college data
+missing_colleges <- read.csv("C:/Users/eliza/Desktop/Tailgate Debates/College Football Data/NFL Draft_missing colleges.csv")
+
+# merge together to fill in missing collegse
+# two players 1994-2021 did not play in college
+draft.table2 <- draft.table %>% left_join(missing_colleges, by= "player") %>%
+  mutate(college = coalesce(college.y, college.x))
+# cut unnecessary variables and fix headers
+draft.table2 <- draft.table2[,c(1:28,35,30:31)]
+colnames(draft.table2) <- c("year",draft.header)
+
+write.csv(draft.table2,file="C:/Users/eliza/Desktop/Tailgate Debates/College Football Data/NFL draft 1994-2021.csv")
+
+####################################
+## not needed in current analysis ##
+####################################
 combine.table <- data_frame(year = 1994:2020) %>%
   group_by(year) %>% do({
     url <- paste('http://www.pro-football-reference.com/draft/', .$year, '-combine.htm', sep ='')
